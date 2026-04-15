@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $error = "Contraseña incorrecta.";
             }
         } else {
-            $error = "No existe un administrador con ese correo o está inactivo.";
+            $error = "no existe un administrador con ese correo, esta inactivo.";
         }
 
         mysqli_stmt_close($stmt);
@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="w-full max-w-md">
 
             <div class="text-center mb-8">
-                <div class="lg:hidden text-4xl mb-3">🍀</div>
+                <div class="lg:hidden text-4xl mb-3"></div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-1">Acceso Administrador</h2>
                 <p class="text-gray-500">Ingresa tus credenciales de administrador</p>
             </div>
