@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("conexion.php");
+include("notif_helper.php");
 
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: 3_login.php");
@@ -63,6 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $saldo   += $monto;
             $msg      = "✅ Recarga de $" . number_format($monto, 0, ',', '.') . " COP procesada exitosamente.";
             $msg_tipo = "exito";
+            crearNotificacion($conexion, $id_usuario,
+                "Recargaste $" . number_format($monto, 0, ",", ".") . " COP a tu saldo vía " . ucfirst($metodo_recarga) . ". Saldo actual: $" . number_format($saldo, 0, ",", ".") . " COP",
+                "⬆️"
+            );
         } catch (Exception $e) {
             mysqli_rollback($conexion);
             $msg      = "Error al procesar la recarga. Intenta de nuevo.";
@@ -111,6 +116,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $saldo   -= $monto;
                     $msg      = "✅ Solicitud de retiro de $" . number_format($monto, 0, ',', '.') . " COP procesada. Se acreditará en 1–3 días hábiles.";
                     $msg_tipo = "exito";
+                    crearNotificacion($conexion, $id_usuario,
+                        "Solicitaste un retiro de $" . number_format($monto, 0, ",", ".") . " COP" . ($banco ? " al banco " . $banco : "") . ". Se acreditará en 1–3 días hábiles.",
+                        "⬇️"
+                    );
                 }
             } catch (Exception $e) {
                 mysqli_rollback($conexion);
