@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("conexion.php");
+include("notif_helper.php");
 
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: 3_login.php");
@@ -201,14 +202,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     }
 
                     // 6. Notificación al comprador
-                    $msg_notif  = "Tu compra de boletas fue registrada exitosamente";
-                    $tipo_notif = "confirmacion";
-                    $stmt_notif = mysqli_prepare($conexion,
-                        "INSERT INTO notificaciones (id_usuario, id_rifa, mensaje, tipo) VALUES (?, ?, ?, ?)"
+                    $boletas_str = implode(", #", array_map(fn($n) => str_pad($n, 4, "0", STR_PAD_LEFT), $numeros_comprados));
+                    crearNotificacion($conexion, $id_usuario,
+                        "Compraste " . count($numeros_comprados) . " boleta(s) de "" . $rifa["titulo"] . "" · Números: #" . $boletas_str . " · Total: $" . number_format($total_compra, 0, ",", ".") . " COP",
+                        "🎫"
                     );
-                    mysqli_stmt_bind_param($stmt_notif, "iiss", $id_usuario, $id_rifa, $msg_notif, $tipo_notif);
-                    mysqli_stmt_execute($stmt_notif);
-                    mysqli_stmt_close($stmt_notif);
+
+                    // Notificación al organizador por nueva venta
+                    if ($id_organizador > 0 && $id_organizador !== $id_usuario) {
+                        crearNotificacion($conexion, $id_organizador,
+                            "¡Nueva venta! " . count($numeros_comprados) . " boleta(s) de tu rifa "" . $rifa["titulo"] . "" fueron compradas · Ganancia: $" . number_format($ganancia_org, 0, ",", ".") . " COP acreditados a tu saldo",
+                            "💰"
+                        );
+                    }
 
                     mysqli_commit($conexion);
 
