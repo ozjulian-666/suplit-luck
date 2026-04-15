@@ -76,7 +76,7 @@ $recuperado = isset($_GET["recuperado"]) && $_GET["recuperado"] === "ok";
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .bg-gradient-luck { background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 50%, #1E3A8A 100%); }
+        .bg-gradient-luck { background: linear-gradient(135deg, #e0e0e0 0%, #1E40AF 50%, #1E3A8A 100%); }
     </style>
 </head>
 <body class="bg-gradient-luck min-h-screen overflow-hidden">
@@ -156,7 +156,7 @@ $recuperado = isset($_GET["recuperado"]) && $_GET["recuperado"] === "ok";
 
             <div class="text-center mt-4">
                 <p class="text-gray-600">¿No tienes cuenta?
-                    <a href="2_registro.php" class="text-blue-600 font-semibold hover:underline">Regístrate gratis</a>
+                    <a href="2_registro.php" class="text-blue-600 font-semibold hover:underline">registrese ahora</a>
                 </p>
             </div>
         </div>
