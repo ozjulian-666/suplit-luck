@@ -31,7 +31,7 @@ unset($_SESSION["compra"]); // Limpiar para que no se repita
 <nav class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
         <a href="4_inicio.php" class="flex items-center font-bold text-xl">🍀 Soplit.Luck</a>
-        <a href="logout.php" class="text-red-600 font-semibold text-sm">Salir</a>
+        <a href="logout.php" class="text-red-600 font-semibold text-sm">sal</a>
     </div>
 </nav>
 
