@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("conexion.php");
+include("notif_helper.php");
 
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: 3_login.php");
@@ -24,6 +25,20 @@ if (!$usuario_data || $usuario_data["estado"] !== "activo") {
 
 $nombre_usuario = $usuario_data["nombre"] . " " . $usuario_data["apellido"];
 $saldo = (float)($usuario_data["saldo"] ?? 0);
+
+// Notificaciones no leídas del usuario
+$notificaciones = [];
+$stmt_noti = mysqli_prepare($conexion,
+    "SELECT id, mensaje, fecha FROM notificaciones WHERE id_usuario = ? AND leida = 0 ORDER BY fecha DESC"
+);
+if ($stmt_noti) {
+    mysqli_stmt_bind_param($stmt_noti, "i", $id_usuario);
+    mysqli_stmt_execute($stmt_noti);
+    $notificaciones = mysqli_fetch_all(mysqli_stmt_get_result($stmt_noti), MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt_noti);
+}
+
+// Las notificaciones se marcan leídas vía fetch cuando el usuario las cierra (ver JS abajo)
 
 // Cargar rifas activas (solo lectura — no usa datos del usuario, segura sin prepared)
 $rifas = mysqli_query($conexion, "SELECT * FROM rifas WHERE estado = 'activa' ORDER BY fecha_fin ASC");
@@ -100,6 +115,22 @@ $imagenes_rifas = [
                     <span class="text-green-600 font-bold">$<?= number_format($saldo, 0, ',', '.') ?></span>
                     <span class="text-green-500 text-xs">saldo</span>
                 </a>
+
+                <!-- Campanita de notificaciones -->
+                <div class="relative">
+                    <button onclick="toggleNotifPanel()"
+                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors text-xl"
+                            title="Notificaciones">
+                        🔔
+                    </button>
+                    <?php if (count($notificaciones) > 0): ?>
+                    <span id="notif-badge"
+                          class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                        <?= count($notificaciones) ?>
+                    </span>
+                    <?php endif; ?>
+                </div>
+
                 <a href="9_informacion.php" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                     <?= strtoupper(substr($nombre_usuario, 0, 2)) ?>
                 </a>
@@ -117,6 +148,96 @@ $imagenes_rifas = [
     <h1 class="text-5xl font-bold mb-3">¡Tu suerte te espera, <?= htmlspecialchars(explode(' ', $nombre_usuario)[0]) ?>!</h1>
     <p class="text-xl text-blue-100">Participa en los mejores sorteos o crea tu propia rifa</p>
 </div>
+
+<!-- PANEL DE NOTIFICACIONES (dropdown desde campanita) -->
+<div id="notif-panel"
+     class="hidden fixed right-4 top-20 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+     style="max-height: 480px; overflow-y: auto;">
+
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50">
+        <div class="flex items-center gap-2">
+            <span class="text-lg">🔔</span>
+            <span class="font-bold text-gray-800 text-sm">Notificaciones</span>
+            <?php if (count($notificaciones) > 0): ?>
+            <span id="notif-badge-panel" class="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
+                <?= count($notificaciones) ?>
+            </span>
+            <?php endif; ?>
+        </div>
+        <button onclick="toggleNotifPanel()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+
+    <div id="notif-list">
+    <?php if (empty($notificaciones)): ?>
+        <div class="text-center py-10 text-gray-400">
+            <div class="text-4xl mb-2">🔕</div>
+            <p class="text-sm">Sin notificaciones</p>
+        </div>
+    <?php else: ?>
+        <?php foreach ($notificaciones as $notif): ?>
+        <div data-id="<?= (int)$notif['id'] ?>"
+             class="notif-item flex items-start gap-3 px-5 py-4 border-b border-gray-50 hover:bg-amber-50 transition-colors">
+            <div class="flex-shrink-0 w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center text-base mt-0.5">
+                ⚠️
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-amber-800 mb-0.5">Aviso del administrador</p>
+                <p class="text-xs text-gray-700 leading-relaxed"><?= htmlspecialchars($notif["mensaje"]) ?></p>
+                <p class="text-[10px] text-gray-400 mt-1"><?= date("d/m/Y H:i", strtotime($notif["fecha"])) ?></p>
+            </div>
+            <button onclick="cerrarNotif(this, <?= (int)$notif['id'] ?>)"
+                    class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-gray-300 hover:bg-red-100 hover:text-red-500 transition-colors text-sm font-bold ml-1"
+                    title="Descartar">✕</button>
+        </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    </div>
+</div>
+
+<!-- Overlay para cerrar panel al hacer click fuera -->
+<div id="notif-overlay" class="hidden fixed inset-0 z-40" onclick="toggleNotifPanel()"></div>
+
+<script>
+let notifCount = <?= count($notificaciones) ?>;
+
+function toggleNotifPanel() {
+    const panel   = document.getElementById('notif-panel');
+    const overlay = document.getElementById('notif-overlay');
+    const isOpen  = !panel.classList.contains('hidden');
+    panel.classList.toggle('hidden');
+    overlay.classList.toggle('hidden');
+}
+
+function cerrarNotif(btn, id) {
+    const item = btn.closest('.notif-item');
+    item.style.transition = 'opacity 0.3s, max-height 0.3s';
+    item.style.opacity = '0';
+    setTimeout(() => {
+        item.remove();
+        notifCount--;
+        actualizarBadge();
+        // Si no quedan, mostrar estado vacío
+        if (notifCount === 0) {
+            document.getElementById('notif-list').innerHTML =
+                '<div class="text-center py-10 text-gray-400"><div class="text-4xl mb-2">🔕</div><p class="text-sm">Sin notificaciones</p></div>';
+        }
+    }, 300);
+    fetch('marcar_notif_leida.php?id=' + id);
+}
+
+function actualizarBadge() {
+    // Badge sobre la campanita
+    const badge = document.getElementById('notif-badge');
+    const badgePanel = document.getElementById('notif-badge-panel');
+    if (notifCount > 0) {
+        if (badge) badge.textContent = notifCount;
+        if (badgePanel) badgePanel.textContent = notifCount;
+    } else {
+        if (badge) badge.remove();
+        if (badgePanel) badgePanel.remove();
+    }
+}
+</script>
 
 <!-- SORTEOS DESDE LA BD -->
 <div class="max-w-7xl mx-auto px-6 py-12">
@@ -181,4 +302,4 @@ $imagenes_rifas = [
 </div>
 
 </body>
-</html>
+</html> 
