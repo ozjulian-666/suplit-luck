@@ -7,7 +7,7 @@ $usuario  = "root";
 $password = "";
 $base     = "soplit_luck";
 
-$conexion = mysqli_connect($host, $usuario, $password, $base, 3307);
+$conexion = mysqli_connect($host, $usuario, $password, $base);
 
 if (!$conexion) {
     die("❌ Error de conexión: " . mysqli_connect_error());

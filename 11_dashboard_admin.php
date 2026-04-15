@@ -7,16 +7,53 @@ if (!isset($_SESSION["usuario_rol"]) || $_SESSION["usuario_rol"] !== "admin") {
     exit();
 }
 
-// ── Acción: finalizar rifa ───────────────────────────────────────────────────
+// ── Acción: eliminar rifa + notificar al organizador ─────────────────────────
 $msg_accion = "";
-if (isset($_GET["accion"]) && $_GET["accion"] === "finalizar" && isset($_GET["rid"])) {
+if (isset($_GET["accion"]) && $_GET["accion"] === "eliminar" && isset($_GET["rid"])) {
     $rid = (int)$_GET["rid"];
     if ($rid > 0) {
-        $stmt_fin = mysqli_prepare($conexion, "UPDATE rifas SET estado = 'finalizada' WHERE id = ?");
-        mysqli_stmt_bind_param($stmt_fin, "i", $rid);
-        mysqli_stmt_execute($stmt_fin);
-        mysqli_stmt_close($stmt_fin);
-        $msg_accion = "Rifa finalizada correctamente.";
+        // Obtener datos de la rifa antes de eliminar
+        $stmt_info = mysqli_prepare($conexion, "SELECT id_organizador, titulo FROM rifas WHERE id = ? AND estado = 'activa'");
+        mysqli_stmt_bind_param($stmt_info, "i", $rid);
+        mysqli_stmt_execute($stmt_info);
+        $rifa_info = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_info));
+        mysqli_stmt_close($stmt_info);
+
+        if ($rifa_info) {
+            // Marcar rifa como eliminada
+            $stmt_fin = mysqli_prepare($conexion, "UPDATE rifas SET estado = 'eliminada' WHERE id = ?");
+            mysqli_stmt_bind_param($stmt_fin, "i", $rid);
+            mysqli_stmt_execute($stmt_fin);
+            mysqli_stmt_close($stmt_fin);
+
+            // Crear tabla notificaciones si aún no existe
+            mysqli_query($conexion,
+                "CREATE TABLE IF NOT EXISTS notificaciones (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id_usuario INT NOT NULL,
+                    mensaje TEXT NOT NULL,
+                    leida TINYINT(1) DEFAULT 0,
+                    fecha DATETIME DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+            );
+
+            // Insertar notificación para el organizador
+            $id_org  = (int)$rifa_info["id_organizador"];
+            $titulo  = $rifa_info["titulo"];
+            $mensaje = "El administrador de Soplit.Luck ha eliminado tu rifa \"" . $titulo . "\". Si tienes dudas, comunícate con el equipo de soporte.";
+            $stmt_noti = mysqli_prepare($conexion,
+                "INSERT INTO notificaciones (id_usuario, mensaje, leida, fecha) VALUES (?, ?, 0, NOW())"
+            );
+            if ($stmt_noti) {
+                mysqli_stmt_bind_param($stmt_noti, "is", $id_org, $mensaje);
+                mysqli_stmt_execute($stmt_noti);
+                mysqli_stmt_close($stmt_noti);
+            }
+
+            $msg_accion = "Rifa eliminada y organizador notificado.";
+        } else {
+            $msg_accion = "No se encontró la rifa o ya no está activa.";
+        }
     }
 }
 
@@ -57,7 +94,7 @@ $top_org = mysqli_query($conexion,
      LIMIT 5"
 );
 
-// ── Rifas activas con progreso ───────────────────────────────────────────────
+// ── Rifas activas con progreso (todas) ──────────────────────────────────────
 $rifas_activas = mysqli_query($conexion,
     "SELECT r.*,
         u.nombre as org_nombre, u.apellido as org_apellido,
@@ -66,7 +103,7 @@ $rifas_activas = mysqli_query($conexion,
      FROM rifas r
      JOIN usuarios u ON u.id = r.id_organizador
      WHERE r.estado = 'activa'
-     ORDER BY r.fecha_fin ASC LIMIT 8"
+     ORDER BY r.fecha_fin ASC"
 );
 
 // ── Últimas transacciones ────────────────────────────────────────────────────
@@ -268,10 +305,10 @@ $ultimas_recargas = mysqli_query($conexion,
                                 </span>
                             </td>
                             <td class="px-3 py-3">
-                                <a href="11_dashboard_admin.php?accion=finalizar&rid=<?= $r['id'] ?>"
-                                   onclick="return confirm('¿Finalizar esta rifa?')"
-                                   class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-red-100 hover:text-red-700 transition-colors">
-                                    Finalizar
+                                <a href="11_dashboard_admin.php?accion=eliminar&rid=<?= $r['id'] ?>"
+                                   onclick="return confirm('¿Eliminar esta rifa? El organizador será notificado.')"
+                                   class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors font-semibold">
+                                    🗑 Eliminar
                                 </a>
                             </td>
                         </tr>

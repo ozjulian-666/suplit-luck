@@ -212,6 +212,118 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     mysqli_commit($conexion);
 
+                    // ══════════════════════════════════════════════════════════════
+                    //  SORTEO AUTOMÁTICO
+                    //  Se activa cuando no queda ninguna boleta disponible en la rifa
+                    // ══════════════════════════════════════════════════════════════
+                    $stmt_disp = mysqli_prepare($conexion,
+                        "SELECT COUNT(*) as total FROM boletas WHERE id_rifa = ? AND estado = 'disponible'"
+                    );
+                    mysqli_stmt_bind_param($stmt_disp, "i", $id_rifa);
+                    mysqli_stmt_execute($stmt_disp);
+                    $boletas_disponibles = (int)mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_disp))["total"];
+                    mysqli_stmt_close($stmt_disp);
+
+                    if ($boletas_disponibles === 0) {
+                        // Traer todas las boletas vendidas con su dueño
+                        $stmt_pool = mysqli_prepare($conexion,
+                            "SELECT b.id AS id_boleta, b.numero, b.id_usuario
+                             FROM boletas b
+                             WHERE b.id_rifa = ? AND b.estado = 'vendida' AND b.id_usuario IS NOT NULL"
+                        );
+                        mysqli_stmt_bind_param($stmt_pool, "i", $id_rifa);
+                        mysqli_stmt_execute($stmt_pool);
+                        $pool = mysqli_fetch_all(mysqli_stmt_get_result($stmt_pool), MYSQLI_ASSOC);
+                        mysqli_stmt_close($stmt_pool);
+
+                        if (!empty($pool)) {
+                            // Elegir ganador aleatoriamente
+                            $ganador = $pool[array_rand($pool)];
+
+                            mysqli_begin_transaction($conexion);
+                            try {
+                                // 1. Actualizar o insertar en tabla sorteos
+                                $stmt_s_exist = mysqli_prepare($conexion,
+                                    "SELECT id FROM sorteos WHERE id_rifa = ? LIMIT 1"
+                                );
+                                mysqli_stmt_bind_param($stmt_s_exist, "i", $id_rifa);
+                                mysqli_stmt_execute($stmt_s_exist);
+                                $fila_sorteo = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_s_exist));
+                                mysqli_stmt_close($stmt_s_exist);
+
+                                if ($fila_sorteo) {
+                                    $id_sorteo = (int)$fila_sorteo["id"];
+                                    $stmt_upd_s = mysqli_prepare($conexion,
+                                        "UPDATE sorteos
+                                         SET numero_ganador = ?, estado = 'ejecutado', fecha_sorteo = NOW()
+                                         WHERE id = ?"
+                                    );
+                                    mysqli_stmt_bind_param($stmt_upd_s, "ii", $ganador["numero"], $id_sorteo);
+                                    mysqli_stmt_execute($stmt_upd_s);
+                                    mysqli_stmt_close($stmt_upd_s);
+                                } else {
+                                    $stmt_ins_s = mysqli_prepare($conexion,
+                                        "INSERT INTO sorteos (id_rifa, fecha_sorteo, numero_ganador, estado)
+                                         VALUES (?, NOW(), ?, 'ejecutado')"
+                                    );
+                                    mysqli_stmt_bind_param($stmt_ins_s, "ii", $id_rifa, $ganador["numero"]);
+                                    mysqli_stmt_execute($stmt_ins_s);
+                                    $id_sorteo = (int)mysqli_stmt_insert_id($stmt_ins_s);
+                                    mysqli_stmt_close($stmt_ins_s);
+                                }
+
+                                // 2. Registrar en tabla ganadores
+                                $stmt_gan = mysqli_prepare($conexion,
+                                    "INSERT INTO ganadores (id_sorteo, id_usuario, id_boleta) VALUES (?, ?, ?)"
+                                );
+                                mysqli_stmt_bind_param($stmt_gan, "iii",
+                                    $id_sorteo,
+                                    $ganador["id_usuario"],
+                                    $ganador["id_boleta"]
+                                );
+                                mysqli_stmt_execute($stmt_gan);
+                                mysqli_stmt_close($stmt_gan);
+
+                                // 3. Marcar la rifa como finalizada
+                                $stmt_fin = mysqli_prepare($conexion,
+                                    "UPDATE rifas SET estado = 'finalizada' WHERE id = ?"
+                                );
+                                mysqli_stmt_bind_param($stmt_fin, "i", $id_rifa);
+                                mysqli_stmt_execute($stmt_fin);
+                                mysqli_stmt_close($stmt_fin);
+
+                                // 4. Notificar al GANADOR
+                                $num_fmt      = str_pad($ganador["numero"], 4, "0", STR_PAD_LEFT);
+                                $msg_ganador  = "🏆 ¡GANASTE la rifa \"" . $rifa["titulo"] . "\"! "
+                                              . "Tu boleta #" . $num_fmt . " fue la ganadora. "
+                                              . "Premio: " . $rifa["premio"] . ". Contacta al organizador para reclamar tu premio.";
+                                $tipo_resultado = "resultado";
+                                $stmt_noti_g = mysqli_prepare($conexion,
+                                    "INSERT INTO notificaciones (id_usuario, id_rifa, mensaje, tipo) VALUES (?, ?, ?, ?)"
+                                );
+                                mysqli_stmt_bind_param($stmt_noti_g, "iiss",
+                                    $ganador["id_usuario"], $id_rifa, $msg_ganador, $tipo_resultado
+                                );
+                                mysqli_stmt_execute($stmt_noti_g);
+                                mysqli_stmt_close($stmt_noti_g);
+
+                                mysqli_commit($conexion);
+
+                                // Guardar en sesión para mostrar resultado en confirmación
+                                $_SESSION["sorteo_ejecutado"] = [
+                                    "rifa_titulo"    => $rifa["titulo"],
+                                    "numero_ganador" => $ganador["numero"],
+                                    "yo_gane"        => ((int)$ganador["id_usuario"] === $id_usuario),
+                                ];
+
+                            } catch (Exception $e_sorteo) {
+                                mysqli_rollback($conexion);
+                                // La compra ya se confirmó; el sorteo se reintentará en la próxima compra o manualmente
+                            }
+                        }
+                    }
+                    // ══════════════════════════════════════════════════════════════
+
                     $_SESSION["compra"] = [
                         "rifa_titulo"  => $rifa["titulo"],
                         "premio"       => $rifa["premio"],

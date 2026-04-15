@@ -9,7 +9,10 @@ if (!isset($_SESSION["usuario_id"]) || !isset($_SESSION["compra"])) {
 
 $compra  = $_SESSION["compra"];
 $numeros = $compra["numeros"];
-unset($_SESSION["compra"]); // Limpiar para que no se repita
+unset($_SESSION["compra"]);
+
+$sorteo = $_SESSION["sorteo_ejecutado"] ?? null;
+unset($_SESSION["sorteo_ejecutado"]);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,7 +34,7 @@ unset($_SESSION["compra"]); // Limpiar para que no se repita
 <nav class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
         <a href="4_inicio.php" class="flex items-center font-bold text-xl">🍀 Soplit.Luck</a>
-        <a href="logout.php" class="text-red-600 font-semibold text-sm">sal</a>
+        <a href="logout.php" class="text-red-600 font-semibold text-sm">Salir</a>
     </div>
 </nav>
 
@@ -43,7 +46,7 @@ unset($_SESSION["compra"]); // Limpiar para que no se repita
         <div class="absolute top-8 right-8 text-2xl confetti">✨</div>
         <div class="absolute bottom-4 right-4 text-2xl confetti">🍀</div>
 
-        <h1 class="text-4xl font-bold mb-2">¡Pago hecho con exito! 🎉</h1>
+        <h1 class="text-4xl font-bold mb-2">¡Pago Exitoso! 🎉</h1>
         <p class="text-green-100 text-lg mb-6"><?= htmlspecialchars($compra["rifa_titulo"]) ?></p>
 
         <div class="flex justify-center gap-10">
@@ -61,6 +64,33 @@ unset($_SESSION["compra"]); // Limpiar para que no se repita
             </div>
         </div>
     </div>
+
+    <!-- Banner sorteo automático (solo si se ejecutó al acabarse los boletos) -->
+    <?php if ($sorteo): ?>
+    <?php if ($sorteo["yo_gane"]): ?>
+    <div class="relative overflow-hidden rounded-2xl text-center p-10 mb-10"
+         style="background: linear-gradient(135deg,#F59E0B,#D97706);">
+        <div class="absolute top-3 left-6 text-3xl confetti">🏆</div>
+        <div class="absolute top-4 right-6 text-3xl confetti">🎊</div>
+        <div class="absolute bottom-3 left-10 text-2xl confetti">⭐</div>
+        <p class="text-white/80 text-sm font-semibold uppercase tracking-widest mb-2">¡Las boletas se agotaron y se realizó el sorteo!</p>
+        <h2 class="text-5xl font-black text-white mb-3">¡¡GANASTE!! 🏆</h2>
+        <p class="text-yellow-100 text-lg mb-1">
+            Tu boleta <span class="font-black text-white text-2xl">#<?= str_pad($sorteo["numero_ganador"], 4, "0", STR_PAD_LEFT) ?></span> fue elegida ganadora
+        </p>
+        <p class="text-yellow-200 text-sm">Revisa tus notificaciones y contacta al organizador para reclamar tu premio.</p>
+    </div>
+    <?php else: ?>
+    <div class="bg-indigo-600 text-white rounded-2xl text-center p-8 mb-10">
+        <p class="text-indigo-200 text-sm uppercase tracking-widest mb-2">Las boletas se agotaron — sorteo ejecutado</p>
+        <h2 class="text-3xl font-bold mb-2">🎲 Resultado del sorteo</h2>
+        <p class="text-indigo-100 text-lg">
+            Número ganador: <span class="font-black text-white text-2xl">#<?= str_pad($sorteo["numero_ganador"], 4, "0", STR_PAD_LEFT) ?></span>
+        </p>
+        <p class="text-indigo-300 text-sm mt-2">Esta vez no fue tu boleta, ¡pero sigue participando!</p>
+    </div>
+    <?php endif; ?>
+    <?php endif; ?>
 
     <!-- Acciones -->
     <div class="flex flex-col md:flex-row justify-center gap-6 mb-12">

@@ -25,6 +25,38 @@ if (!$usuario_data || $usuario_data["estado"] !== "activo") {
 $nombre_usuario = $usuario_data["nombre"] . " " . $usuario_data["apellido"];
 $saldo = (float)($usuario_data["saldo"] ?? 0);
 
+// Notificaciones no leídas del usuario (rifas eliminadas por admin, etc.)
+// Crear tabla si no existe (por si el admin aún no eliminó ninguna rifa)
+mysqli_query($conexion,
+    "CREATE TABLE IF NOT EXISTS notificaciones (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        id_usuario INT NOT NULL,
+        mensaje TEXT NOT NULL,
+        leida TINYINT(1) DEFAULT 0,
+        fecha DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+$notificaciones = [];
+$stmt_noti = mysqli_prepare($conexion,
+    "SELECT id, mensaje, fecha FROM notificaciones WHERE id_usuario = ? AND leida = 0 ORDER BY fecha DESC"
+);
+if ($stmt_noti) {
+    mysqli_stmt_bind_param($stmt_noti, "i", $id_usuario);
+    mysqli_stmt_execute($stmt_noti);
+    $notificaciones = mysqli_fetch_all(mysqli_stmt_get_result($stmt_noti), MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt_noti);
+}
+
+// Marcar notificaciones como leídas al verlas
+if (!empty($notificaciones)) {
+    $stmt_read = mysqli_prepare($conexion,
+        "UPDATE notificaciones SET leida = 1 WHERE id_usuario = ? AND leida = 0"
+    );
+    mysqli_stmt_bind_param($stmt_read, "i", $id_usuario);
+    mysqli_stmt_execute($stmt_read);
+    mysqli_stmt_close($stmt_read);
+}
+
 // Cargar rifas activas (solo lectura — no usa datos del usuario, segura sin prepared)
 $rifas = mysqli_query($conexion, "SELECT * FROM rifas WHERE estado = 'activa' ORDER BY fecha_fin ASC");
 
@@ -117,6 +149,34 @@ $imagenes_rifas = [
     <h1 class="text-5xl font-bold mb-3">¡Tu suerte te espera, <?= htmlspecialchars(explode(' ', $nombre_usuario)[0]) ?>!</h1>
     <p class="text-xl text-blue-100">Participa en los mejores sorteos o crea tu propia rifa</p>
 </div>
+
+<!-- NOTIFICACIONES ADMIN -->
+<?php if (!empty($notificaciones)): ?>
+<div id="notif-wrapper" class="max-w-7xl mx-auto px-6 pt-6 space-y-3">
+    <?php foreach ($notificaciones as $notif): ?>
+    <div class="flex items-start gap-4 bg-amber-50 border border-amber-300 rounded-2xl px-5 py-4 shadow-sm relative notif-item">
+        <div class="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl">
+            🔔
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-amber-900 mb-0.5">Aviso del administrador</p>
+            <p class="text-sm text-amber-800"><?= htmlspecialchars($notif["mensaje"]) ?></p>
+            <p class="text-xs text-amber-500 mt-1"><?= date("d/m/Y H:i", strtotime($notif["fecha"])) ?></p>
+        </div>
+        <button onclick="this.closest('.notif-item').style.display='none'; checkEmpty();"
+                class="flex-shrink-0 text-amber-400 hover:text-amber-600 transition-colors ml-2 mt-0.5 text-lg leading-none"
+                title="Cerrar">×</button>
+    </div>
+    <?php endforeach; ?>
+</div>
+<script>
+function checkEmpty() {
+    const items = document.querySelectorAll('.notif-item');
+    const visible = Array.from(items).some(el => el.style.display !== 'none');
+    if (!visible) document.getElementById('notif-wrapper').style.display = 'none';
+}
+</script>
+<?php endif; ?>
 
 <!-- SORTEOS DESDE LA BD -->
 <div class="max-w-7xl mx-auto px-6 py-12">
