@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - Soplit.Luck</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Inter', sans-serif; }
+.secure-gradient { background: linear-gradient(135deg,#10B981,#059669); }
+</style>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- NAV -->
+<nav class="bg-white shadow-sm border-b">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex justify-between items-center h-16">
+
+<div class="flex items-center">
+<a href="rifa.html" class="mr-4 p-2 hover:bg-gray-100 rounded-lg">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+</svg>
+</a>
+
+<a href="inicio.html" class="flex items-center">
+<div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">🍀</div>
+<span class="text-xl font-bold">Soplit.Luck</span>
+</a>
+</div>
+
+<div class="text-sm text-gray-600">
+<div class="font-medium">Juan Pérez</div>
+<div class="text-xs">Saldo: $45.000</div>
+</div>
+
+</div>
+</div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+<!-- FORM -->
+<div class="lg:col-span-2">
+
+<div class="secure-gradient text-white p-4 rounded-xl mb-6 flex items-center">
+<div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">🔒</div>
+<div>
+<div class="font-semibold">Pago Seguro</div>
+<div class="text-sm text-green-100">Simulación sin backend</div>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm p-8 mb-6">
+<h2 class="text-2xl font-bold mb-6">Método de Pago</h2>
+
+<div class="space-y-4 mb-6">
+<label class="flex items-center p-4 border-2 border-blue-500 bg-blue-50 rounded-xl">
+<input type="radio" checked class="w-4 h-4">
+<div class="ml-4 flex justify-between w-full">
+<span class="font-medium">Tarjeta</span>
+<div class="flex space-x-2">
+<img src="assets/img/visa.png" class="h-6">
+<img src="assets/img/mastercard.png" class="h-6">
+</div>
+</div>
+</label>
+</div>
+
+<div class="grid grid-cols-1 gap-4 border-t pt-6">
+<input placeholder="Número de tarjeta" class="border p-3 rounded-lg">
+<input placeholder="MM/AA" class="border p-3 rounded-lg">
+<input placeholder="CVV" class="border p-3 rounded-lg">
+<input placeholder="Nombre del titular" class="border p-3 rounded-lg">
+</div>
+</div>
+
+</div>
+
+<!-- RESUMEN -->
+<div class="bg-white rounded-2xl shadow-sm p-6 sticky top-8">
+
+<div class="flex items-center mb-6">
+<img src="assets/img/iphone.png" class="w-16 h-16 rounded-lg mr-4">
+<div>
+<h3 class="font-bold">iPhone 15 Pro Max</h3>
+<p class="text-sm text-gray-600">3 boletos</p>
+<a href="rifa.html" class="text-blue-600 text-sm font-medium">Cambiar selección</a>
+</div>
+</div>
+
+<div class="border-t pt-4 mb-6">
+<div class="flex justify-between">
+<span>Total:</span>
+<span class="text-2xl font-bold text-green-600">$45.000</span>
+</div>
+</div>
+
+<label class="flex items-start mb-6">
+<input type="checkbox" id="terms" class="mt-1">
+<span class="ml-3 text-sm">Acepto términos y condiciones</span>
+</label>
+
+<button onclick="pagar()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold">
+💳 Pagar $45.000
+</button>
+
+</div>
+
+</div>
+
+<script>
+function pagar(){
+if(!document.getElementById("terms").checked){
+alert("Debes aceptar los términos");
+return;
+}
+window.location.href="confirmacion.html";
+}
+</script>
+
+</body>
+</html>

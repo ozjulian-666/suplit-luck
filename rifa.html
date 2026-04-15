@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone 15 Pro Max - Soplit.Luck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .countdown-timer { 
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- NAV -->
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-center h-16">
+
+            <div class="flex items-center">
+                <a href="inicio.html" class="mr-4 p-2 hover:bg-gray-100 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </a>
+                <a href="inicio.html" class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-lg">🍀</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Soplit.Luck</span>
+                </a>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="text-sm text-gray-600">
+                    Saldo: <span class="font-semibold text-gray-900">$45.000</span>
+                </div>
+                <a href="informacion.html" class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    JP
+                </a>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- CONTENIDO -->
+        <div class="lg:col-span-2">
+
+            <!-- COUNTDOWN -->
+            <div class="countdown-timer text-white p-6 rounded-2xl mb-8 text-center">
+                <h2 class="text-2xl font-bold mb-4">⏰ ¡El sorteo termina pronto!</h2>
+                <p class="text-lg">2 días · 14 horas · 37 min · 22 seg</p>
+            </div>
+
+            <!-- IMÁGENES -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <img src="assets/img/iphone.png" class="w-full h-80 object-contain bg-gray-50 rounded-xl mb-6">
+
+                <div class="grid grid-cols-4 gap-4">
+                    <img src="assets/img/iphone-box.png" class="h-20 bg-gray-50 rounded-lg">
+                    <img src="assets/img/iphone-camera.png" class="h-20 bg-gray-50 rounded-lg">
+                    <img src="assets/img/iphone-colors.png" class="h-20 bg-gray-50 rounded-lg">
+                    <img src="assets/img/iphone.png" class="h-20 bg-gray-50 rounded-lg">
+                </div>
+            </div>
+
+            <!-- DETALLES -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h1 class="text-4xl font-bold mb-4">iPhone 15 Pro Max 256GB</h1>
+                <ul class="space-y-2 text-gray-700">
+                    <li>• Producto nuevo, sellado</li>
+                    <li>• Garantía oficial Apple</li>
+                    <li>• Entrega gratuita en principales ciudades</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-8">
+
+                <div class="text-center mb-6">
+                    <div class="text-4xl font-bold text-blue-600">$15.000</div>
+                    <div class="text-gray-600">por boleto</div>
+                </div>
+
+                <!-- CANTIDAD -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Cantidad de boletos</label>
+                    <div class="flex items-center border rounded-lg">
+                        <button onclick="changeQty(-1)" class="p-3">−</button>
+                        <input id="qty" type="number" value="1" min="1" max="15"
+                               class="flex-1 text-center py-3 border-0">
+                        <button onclick="changeQty(1)" class="p-3">+</button>
+                    </div>
+                </div>
+
+                <!-- TOTAL -->
+                <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                    <div class="flex justify-between">
+                        <span>Total a pagar:</span>
+                        <span id="total" class="text-2xl font-bold">$15.000</span>
+                    </div>
+                </div>
+
+                <!-- COMPRAR -->
+                <a href="compra.html" class="block text-center bg-blue-600 text-white py-4 rounded-xl font-bold text-lg">
+                    💳 Comprar Boletos
+                </a>
+
+                <p class="text-xs text-center text-gray-500 mt-4">🔒 Pago seguro</p>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const price = 15000;
+const qtyInput = document.getElementById("qty");
+const total = document.getElementById("total");
+
+function changeQty(value) {
+    let qty = parseInt(qtyInput.value) + value;
+    if (qty < 1) qty = 1;
+    if (qty > 15) qty = 15;
+    qtyInput.value = qty;
+    total.innerText = `$${(qty * price).toLocaleString()}`;
+}
+</script>
+
+</body>
+</html>

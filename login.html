@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soplit.Luck - Iniciar Sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-gradient-luck { background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 50%, #1E3A8A 100%); }
+        .card-shadow { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-luck min-h-screen overflow-hidden">
+
+<div class="min-h-screen flex">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-800/80 to-blue-900/90 p-12 flex flex-col justify-center relative overflow-hidden">
+        <div class="absolute top-20 right-20 w-32 h-32 bg-white/5 rounded-full animate-float"></div>
+        <div class="absolute bottom-32 left-20 w-24 h-24 bg-yellow-400/10 rounded-full animate-float" style="animation-delay:-2s"></div>
+
+        <div class="relative z-10">
+            <div class="mb-12">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-2xl mb-6">
+                    <span class="text-4xl">🍀</span>
+                </div>
+                <h1 class="text-6xl font-bold text-white mb-4">Soplit.Luck</h1>
+                <p class="text-2xl text-blue-100">Plataforma líder en rifas virtuales</p>
+            </div>
+
+            <div class="space-y-4 text-white text-xl">
+                <p>✔ Sorteos transparentes</p>
+                <p>✔ Premios diarios</p>
+                <p>✔ Pagos seguros</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="w-1/2 flex items-center justify-center p-12 bg-white">
+        <div class="w-full max-w-md">
+
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2">¡Bienvenido!</h2>
+                <p class="text-gray-600">Inicia sesión para continuar</p>
+            </div>
+
+            <!-- FORMULARIO -->
+            <form class="space-y-6" onsubmit="handleLogin(event)">
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700">Correo Electrónico</label>
+                    <input type="email" required class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700">Contraseña</label>
+                    <input type="password" required class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center text-sm text-gray-600">
+                        <input type="checkbox" class="mr-2">
+                        Mantener sesión iniciada
+                    </label>
+                    <a href="#" onclick="forgotPassword()" class="text-sm text-blue-600 font-medium">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="text-center mt-6">
+                <p class="text-gray-600">¿No tienes cuenta?
+                    <a href="registro.html" class="text-blue-600 font-semibold hover:underline">
+                        Regístrate gratis
+                    </a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function handleLogin(event) {
+    event.preventDefault();
+    alert("Inicio de sesión exitoso 🍀");
+    window.location.href = "inicio.html";
+}
+
+function forgotPassword() {
+    alert("Recuperación de contraseña en desarrollo 🔒");
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Pago Exitoso! - Soplit.Luck</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Inter', sans-serif; }
+.success-gradient { background: linear-gradient(135deg,#10B981,#059669); }
+.ticket-gradient { background: linear-gradient(135deg,#3B82F6,#1E40AF); }
+.confetti { animation: confetti 3s ease-in-out infinite; }
+@keyframes confetti {
+0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}
+}
+.ticket-number { font-family: 'Courier New', monospace; }
+</style>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- NAV -->
+<nav class="bg-white shadow-sm border-b">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex justify-between items-center h-16">
+
+<a href="inicio.html" class="flex items-center">
+<div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">🍀</div>
+<span class="text-xl font-bold">Soplit.Luck</span>
+</a>
+
+<div class="flex items-center space-x-4 text-sm">
+<span class="font-medium">Juan Pérez</span>
+<button onclick="logout()" class="text-red-600 font-semibold">Salir</button>
+</div>
+
+</div>
+</div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+<!-- SUCCESS -->
+<div class="success-gradient text-white p-8 rounded-2xl text-center mb-10 relative overflow-hidden">
+<div class="absolute top-4 left-4 text-2xl confetti">🎉</div>
+<div class="absolute top-8 right-8 text-2xl confetti">✨</div>
+
+<h1 class="text-4xl font-bold mb-2">¡Pago Exitoso! 🎉</h1>
+<p class="text-green-100 text-lg mb-6">Tus boletos fueron generados correctamente</p>
+
+<div class="flex justify-center gap-8">
+<div>
+<div class="text-2xl font-bold">3</div>
+<div class="text-green-100">Boletos</div>
+</div>
+<div>
+<div class="text-2xl font-bold">$45.000</div>
+<div class="text-green-100">Pagado</div>
+</div>
+<div>
+<div class="text-2xl font-bold">2 días</div>
+<div class="text-green-100">Para el sorteo</div>
+</div>
+</div>
+</div>
+
+<!-- ACTIONS -->
+<div class="flex flex-col md:flex-row justify-center gap-6 mb-12">
+<a href="inicio.html" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-center">
+🏠 Volver al Inicio
+</a>
+<a href="rifa.html" class="bg-gray-200 px-8 py-4 rounded-xl font-bold text-center">
+🎯 Ver Más Sorteos
+</a>
+</div>
+
+<!-- TICKETS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+<div class="ticket-gradient text-white p-6 rounded-2xl">
+<p class="text-sm text-blue-100">Boleto</p>
+<p class="text-3xl font-bold ticket-number">0247</p>
+<p class="mt-4">iPhone 15 Pro Max</p>
+</div>
+
+<div class="ticket-gradient text-white p-6 rounded-2xl">
+<p class="text-sm text-blue-100">Boleto</p>
+<p class="text-3xl font-bold ticket-number">0891</p>
+<p class="mt-4">iPhone 15 Pro Max</p>
+</div>
+
+<div class="ticket-gradient text-white p-6 rounded-2xl">
+<p class="text-sm text-blue-100">Boleto</p>
+<p class="text-3xl font-bold ticket-number">1356</p>
+<p class="mt-4">iPhone 15 Pro Max</p>
+</div>
+
+</div>
+
+<!-- SHARE -->
+<div class="bg-white rounded-2xl shadow-sm p-6 mt-12">
+<h3 class="text-xl font-bold mb-4">Compartir</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<button onclick="share('Facebook')" class="bg-blue-600 text-white py-3 rounded-lg">Facebook</button>
+<button onclick="share('WhatsApp')" class="bg-green-500 text-white py-3 rounded-lg">WhatsApp</button>
+<button onclick="share('Enlace')" class="border py-3 rounded-lg">Copiar Enlace</button>
+</div>
+</div>
+
+</div>
+
+<script>
+function logout(){
+alert("Sesión cerrada");
+window.location.href="invitado.html";
+}
+
+function share(red){
+alert("Compartido en " + red + " (simulado)");
+}
+</script>
+
+</body>
+</html>

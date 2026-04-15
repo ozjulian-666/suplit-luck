@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Perfil | Soplit Luck</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Inter', sans-serif; }
+.profile-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+</style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-white shadow border-b px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+        <a href="inicio.html" class="p-2 rounded hover:bg-gray-100" title="Volver al inicio">
+            ←
+        </a>
+        <h1 class="text-xl font-bold">Mi Perfil</h1>
+    </div>
+
+    <div class="flex gap-3">
+        <a href="inicio.html"
+           class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+           Inicio
+        </a>
+        <a href="invitado.html"
+           class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+           Cerrar sesión
+        </a>
+    </div>
+</header>
+
+<!-- PERFIL -->
+<section class="profile-gradient text-white py-10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-6">
+        <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-4xl">
+            👤
+        </div>
+        <div class="flex-1">
+            <h2 class="text-3xl font-extrabold">Juan Pérez</h2>
+            <p class="text-purple-100">juan@email.com</p>
+            <p class="text-purple-100">Saldo actual: <strong>$0</strong></p>
+        </div>
+        <button onclick="editarPerfil()"
+            class="bg-white/20 px-6 py-3 rounded-xl font-bold hover:bg-white/30">
+            ✏️ Editar perfil
+        </button>
+    </div>
+</section>
+
+<!-- CONTENIDO -->
+<main class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+
+<!-- SIDEBAR -->
+<aside class="md:col-span-1 bg-white rounded-xl shadow p-6 space-y-4">
+    <a href="#boletos" class="block font-medium hover:text-blue-600">🎫 Mis boletos</a>
+    <a href="#historial" class="block font-medium hover:text-blue-600">📄 Historial</a>
+    <a href="#configuracion" class="block font-medium hover:text-blue-600">⚙️ Configuración</a>
+
+    <hr>
+
+    <a href="rifa.html"
+       class="block bg-green-600 text-white text-center py-3 rounded-lg font-bold hover:bg-green-700">
+       Comprar boletos
+    </a>
+</aside>
+
+<!-- MAIN -->
+<section class="md:col-span-3 space-y-8">
+
+<!-- BOLETOS -->
+<section id="boletos" class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-xl font-bold mb-4">Mis boletos activos</h3>
+
+    <div class="border rounded-lg p-4 flex justify-between items-center">
+        <div>
+            <p class="font-bold">Gran Sorteo iPhone</p>
+            <p class="text-sm text-gray-500">3 boletos activos</p>
+        </div>
+        <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm">
+            Activo
+        </span>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="rifa.html" class="text-blue-600 font-medium hover:underline">
+            Comprar más boletos →
+        </a>
+    </div>
+</section>
+
+<!-- HISTORIAL -->
+<section id="historial" class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-xl font-bold mb-4">Historial</h3>
+
+    <ul class="space-y-3 text-sm">
+        <li class="flex justify-between">
+            <span>Compra de boletos</span>
+            <span class="text-red-600">- $45.000</span>
+        </li>
+        <li class="flex justify-between">
+            <span>Recarga de saldo</span>
+            <span class="text-green-600">+ $45.000</span>
+        </li>
+    </ul>
+</section>
+
+<!-- CONFIGURACIÓN -->
+<section id="configuracion" class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-xl font-bold mb-4">Configuración</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <input type="text" value="Juan Pérez"
+            class="border rounded px-3 py-2">
+        <input type="email" value="juan@email.com"
+            class="border rounded px-3 py-2">
+    </div>
+
+    <button onclick="guardarCambios()"
+        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        Guardar cambios
+    </button>
+</section>
+
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-white py-6 text-center">
+    <p class="text-sm">&copy; 2024 Soplit Luck</p>
+</footer>
+
+<!-- JS SIMULADO -->
+<script>
+function editarPerfil() {
+    alert("Editar perfil (simulado)");
+}
+function guardarCambios() {
+    alert("Cambios guardados (simulado)");
+}
+</script>
+
+</body>
+</html>
