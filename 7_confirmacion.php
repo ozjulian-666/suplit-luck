@@ -43,7 +43,7 @@ unset($_SESSION["compra"]); // Limpiar para que no se repita
         <div class="absolute top-8 right-8 text-2xl confetti">✨</div>
         <div class="absolute bottom-4 right-4 text-2xl confetti">🍀</div>
 
-        <h1 class="text-4xl font-bold mb-2">¡Pago Exitoso! 🎉</h1>
+        <h1 class="text-4xl font-bold mb-2">¡Pago hecho con exito! 🎉</h1>
         <p class="text-green-100 text-lg mb-6"><?= htmlspecialchars($compra["rifa_titulo"]) ?></p>
 
         <div class="flex justify-center gap-10">
